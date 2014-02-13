@@ -34,3 +34,18 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# Eclipse
+*.pydevproject
+.project
+.metadata
+
+# Intellij project files
+*.iml
+*.ipr
+*.iws
+.idea
+
+# Emacs
+\#*\#
+.#*
