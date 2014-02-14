@@ -1,21 +1,26 @@
 import argparse
 import os
+import re
 import subprocess
 import xml.etree.ElementTree as ET
 
 
 class Issue:
-    def __init__(self, filepath, safe_remove):
-        self.filepath, self.safe_remove = filepath, safe_remove
+    pattern = re.compile('The resource (.+) appears to be unused')
+
+    def __init__(self, filepath, remove_entire_file):
+        self.filepath, self.remove_entire_file = filepath, remove_entire_file
+        self.elements = []
 
     def __str__(self):
-        return '{0} {1}'.format(self.filepath, self.safe_remove)
+        return '{0} {1}'.format(self.filepath, self.remove_entire_file)
 
     def __repr__(self):
-        return '{0} {1}'.format(self.filepath, self.safe_remove)
+        return '{0} {1}'.format(self.filepath, self.remove_entire_file)
 
-    def add_message(self, message):
-        self.message = message
+    def add_element(self, message):
+        res = re.findall(Issue.pattern, message)[0]
+        self.elements.append(res.split('.')[-1:][0])
 
 
 def parse_args():
@@ -54,10 +59,10 @@ def parse_lint_result(lint_result_path):
             filepath = location.get('file')
             # if the location contains line and/or column attribute not the entire resource is unused. that's a guess ;)
             #TODO stop guessing
-            safe_remove = (location.get('line') or location.get('column')) is None
-            issue = Issue(filepath, safe_remove)
-            if not safe_remove:
-                issue.add_message(generate_issue_message(issue_xml, location))
+            remove_entire_file = (location.get('line') or location.get('column')) is None
+            issue = Issue(filepath, remove_entire_file)
+            if not remove_entire_file:
+                issue.add_element(generate_issue_message(issue_xml, location))
             issues.append(issue)
     return issues
 
@@ -67,21 +72,24 @@ def remove_resource_file(filepath):
     os.remove(os.path.abspath(filepath))
 
 
-def print_issues_messages(messages):
-    print '\n{0} problem(s) could not be handled automatically:'.format(len(messages))
-    for message in messages:
-        print message
+def remove_resource_value(issue, filepath):
+    for element in issue.elements:
+        print 'removing {0} from resource {1}'.format(element, filepath)
+        tree = ET.parse(filepath)
+        root = tree.getroot()
+        for unused_value in root.findall('.//string[@name="{0}"]'.format(element)):
+            root.remove(unused_value)
+        with open(filepath, 'w') as resource:
+            tree.write(resource, encoding='utf-8', xml_declaration=True)
 
 
 def remove_unused_resources(issues, app_dir):
-    messages = []
     for issue in issues:
-        if issue.safe_remove:
-            filepath = os.path.join(app_dir, issue.filepath)
+        filepath = os.path.join(app_dir, issue.filepath)
+        if issue.remove_entire_file:
             remove_resource_file(filepath)
-        else:
-            messages.append(issue.message)
-    print_issues_messages(messages)
+        elif len(issue.elements) > 0:
+            remove_resource_value(issue, filepath)
 
 
 if __name__ == '__main__':
