@@ -101,4 +101,42 @@
             file="res\xml\xml_missing.xml"/>
     </issue>
 
+    <issue
+        id="IconDipSize"
+        severity="Warning"
+        message="The image missing.png varies significantly in its density-independent (dip) size across the various density versions: drawable-ldpi\missing.png: 96x96 dp (72x72 px), drawable-mdpi\missing.png: 72x72 dp (72x72 px), drawable-hdpi\missing.png: 48x48 dp (72x72 px), drawable-xhdpi\missing.png: 36x36 dp (72x72 px)"
+        category="Usability:Icons"
+        priority="5"
+        summary="Ensures that icons across densities provide roughly the same density-independent size"
+        explanation="Checks the all icons which are provided in multiple densities, all compute to roughly the same density-independent pixel (`dip`) size. This catches errors where images are either placed in the wrong folder, or icons are changed to new sizes but some folders are forgotten.">
+        <location
+            file="res\drawable-xhdpi\missing.png"/>
+        <location
+            file="res\drawable-hdpi\missing.png"/>
+        <location
+            file="res\drawable-mdpi\missing.png"/>
+        <location
+            file="res\drawable-ldpi\missing.png"/>
+    </issue>
+
+    <issue
+        id="IconDuplicates"
+        severity="Warning"
+        message="The following unrelated icon files have identical contents: ic_launcher.png, missing.png, missing.png, missing.png, missing.png"
+        category="Usability:Icons"
+        priority="3"
+        summary="Finds duplicated icons under different names"
+        explanation="If an icon is repeated under different names, you can consolidate and just use one of the icons and delete the others to make your application smaller. However, duplicated icons usually are not intentional and can sometimes point to icons that were accidentally overwritten or accidentally not updated.">
+        <location
+            file="res\drawable-xhdpi\missing.png"/>
+        <location
+            file="res\drawable-mdpi\missing.png"/>
+        <location
+            file="res\drawable-ldpi\missing.png"/>
+        <location
+            file="res\drawable-hdpi\missing.png"/>
+        <location
+            file="res\drawable-hdpi\ic_launcher.png"/>
+    </issue>
+
 </issues>
