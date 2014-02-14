@@ -24,8 +24,7 @@ Prints help message.
 #### --lint
 Full path to the lint tool like: `d:\Dev\Android SDK\tools\lint`
 
-This will be executed as the lint command. If not provided it assumes the lint command in available and runs:
-```lint```
+This will be executed as the lint command. If not provided it assumes the lint command in available and runs: `lint`
 
 #### --app
 Full path to the android app like: `d:\Dev\My_Android_App`
