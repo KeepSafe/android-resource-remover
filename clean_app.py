@@ -50,15 +50,15 @@ def parse_lint_result(lint_result_path):
     root = ET.parse(lint_result_path).getroot()
     issues = []
     for issue_xml in root.findall('.//issue[@id="UnusedResources"]'):
-        location = issue_xml.find('location')
-        filepath = location.get('file')
-        # if the location contains line and/or column attribute not the entire resource is unused. that's a guess ;)
-        #TODO stop guessing
-        safe_remove = (location.get('line') or location.get('column')) is None
-        issue = Issue(filepath, safe_remove)
-        if not safe_remove:
-            issue.add_message(generate_issue_message(issue_xml, location))
-        issues.append(issue)
+        for location in issue_xml.findall('location'):
+            filepath = location.get('file')
+            # if the location contains line and/or column attribute not the entire resource is unused. that's a guess ;)
+            #TODO stop guessing
+            safe_remove = (location.get('line') or location.get('column')) is None
+            issue = Issue(filepath, safe_remove)
+            if not safe_remove:
+                issue.add_message(generate_issue_message(issue_xml, location))
+            issues.append(issue)
     return issues
 
 
