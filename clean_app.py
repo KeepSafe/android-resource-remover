@@ -53,6 +53,7 @@ def parse_lint_result(lint_result_path):
         location = issue_xml.find('location')
         filepath = location.get('file')
         # if the location contains line and/or column attribute not the entire resource is unused. that's a guess ;)
+        #TODO stop guessing
         safe_remove = (location.get('line') or location.get('column')) is None
         issue = Issue(filepath, safe_remove)
         if not safe_remove:
@@ -62,24 +63,29 @@ def parse_lint_result(lint_result_path):
 
 
 def remove_resource_file(filepath):
+    print 'removing resource: {0}'.format(filepath)
     os.remove(os.path.abspath(filepath))
 
 
-def print_issue_message(issue):
-    print issue.message
+def print_issues_messages(messages):
+    print '\n{0} problem(s) could not be handled automatically:'.format(len(messages))
+    for message in messages:
+        print message
 
 
 def remove_unused_resources(issues, app_dir):
+    messages = []
     for issue in issues:
         if issue.safe_remove:
             filepath = os.path.join(app_dir, issue.filepath)
             remove_resource_file(filepath)
         else:
-            print_issue_message(issue)
+            messages.append(issue.message)
+    print_issues_messages(messages)
 
 
 if __name__ == '__main__':
-    lint_result_path,app_dir = run_lint_command()
+    lint_result_path, app_dir = run_lint_command()
     issues = parse_lint_result(lint_result_path)
     remove_unused_resources(issues, app_dir)
 
