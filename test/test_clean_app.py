@@ -33,7 +33,7 @@ class CleanAppTestCase(unittest.TestCase):
 
         issue = clean_app.Issue(temp_path, True)
 
-        clean_app.remove_unused_resources([issue])
+        clean_app.remove_unused_resources([issue], os.path.dirname(temp_path))
         with self.assertRaises(IOError):
             open(temp_path)
 
@@ -44,7 +44,7 @@ class CleanAppTestCase(unittest.TestCase):
         issue = clean_app.Issue(temp_path, False)
         issue.add_message('testing')
 
-        clean_app.remove_unused_resources([issue])
+        clean_app.remove_unused_resources([issue], os.path.dirname(temp_path))
         with open(temp_path) as res:
             self.assertIsNotNone(res)
 
