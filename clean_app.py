@@ -1,3 +1,14 @@
+"""
+    clean_app
+    ~~~~~~~~~~
+
+    Implements methods for removing unused android resources based on Angular
+    Lint results.
+
+    :copyright: (c) 2014 by KeepSafe.
+    :license: Apache, see LICENSE for more details.
+"""
+
 import argparse
 import os
 import re
@@ -6,6 +17,9 @@ import xml.etree.ElementTree as ET
 
 
 class Issue:
+    """
+    Stores a single issue reported by Android Lint
+    """
     pattern = re.compile('The resource (.+) appears to be unused')
 
     def __init__(self, filepath, remove_entire_file):
@@ -20,7 +34,8 @@ class Issue:
 
     def add_element(self, message):
         res = re.findall(Issue.pattern, message)[0]
-        self.elements.append(res.split('.')[-1:][0])
+        bits = res.split('.')[-2:]
+        self.elements.append((bits[0], bits[1]))
 
 
 def parse_args():
@@ -62,7 +77,7 @@ def parse_lint_result(lint_result_path):
             remove_entire_file = (location.get('line') or location.get('column')) is None
             issue = Issue(filepath, remove_entire_file)
             if not remove_entire_file:
-                issue.add_element(generate_issue_message(issue_xml, location))
+                issue.add_element(issue_xml.get('message'))
             issues.append(issue)
     return issues
 
@@ -77,7 +92,7 @@ def remove_resource_value(issue, filepath):
         print 'removing {0} from resource {1}'.format(element, filepath)
         tree = ET.parse(filepath)
         root = tree.getroot()
-        for unused_value in root.findall('.//string[@name="{0}"]'.format(element)):
+        for unused_value in root.findall('.//{0}[@name="{1}"]'.format(element[0], element[1])):
             root.remove(unused_value)
         with open(filepath, 'w') as resource:
             tree.write(resource, encoding='utf-8', xml_declaration=True)
