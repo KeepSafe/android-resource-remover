@@ -2,7 +2,7 @@
     clean_app
     ~~~~~~~~~~
 
-    Implements methods for removing unused android resources based on Angular
+    Implements methods for removing unused android resources based on Android
     Lint results.
 
     :copyright: (c) 2014 by KeepSafe.
@@ -22,15 +22,15 @@ class Issue:
     """
     pattern = re.compile('The resource (.+) appears to be unused')
 
-    def __init__(self, filepath, remove_entire_file):
-        self.filepath, self.remove_entire_file = filepath, remove_entire_file
+    def __init__(self, filepath):
+        self.filepath = filepath
         self.elements = []
 
     def __str__(self):
-        return '{0} {1}'.format(self.filepath, self.remove_entire_file)
+        return '{0} {1}'.format(self.filepath)
 
     def __repr__(self):
-        return '{0} {1}'.format(self.filepath, self.remove_entire_file)
+        return '{0} {1}'.format(self.filepath)
 
     def add_element(self, message):
         res = re.findall(Issue.pattern, message)[0]
@@ -39,6 +39,9 @@ class Issue:
 
 
 def parse_args():
+    """
+    Parse command line arguments.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('--lint',
                         help='Path to the ADT lint tool. If not specified it assumes lint tool is in your path',
@@ -52,6 +55,9 @@ def parse_args():
 
 
 def run_lint_command():
+    """
+    Run lint command in the shell and save results to lint-result.xml
+    """
     lint, app_dir = parse_args()
     result_file = os.path.join(app_dir, 'lint-result.xml')
     call_result = subprocess.call([lint, app_dir, '--xml', result_file], shell=True)
@@ -61,12 +67,10 @@ def run_lint_command():
     return result_file, app_dir
 
 
-def generate_issue_message(issue, location):
-    return 'file: {0} line: {1} column: {2}; {3}'.format(location.get('file'), location.get('line'),
-                                                         location.get('column'), issue.get('message'))
-
-
 def parse_lint_result(lint_result_path):
+    """
+    Parse lint-result.xml and create Issue for every problem found
+    """
     root = ET.parse(lint_result_path).getroot()
     issues = []
     for issue_xml in root.findall('.//issue[@id="UnusedResources"]'):
@@ -75,7 +79,7 @@ def parse_lint_result(lint_result_path):
             # if the location contains line and/or column attribute not the entire resource is unused. that's a guess ;)
             #TODO stop guessing
             remove_entire_file = (location.get('line') or location.get('column')) is None
-            issue = Issue(filepath, remove_entire_file)
+            issue = Issue(filepath)
             if not remove_entire_file:
                 issue.add_element(issue_xml.get('message'))
             issues.append(issue)
@@ -83,11 +87,17 @@ def parse_lint_result(lint_result_path):
 
 
 def remove_resource_file(filepath):
+    """
+    Delete a file from the filesystem
+    """
     print 'removing resource: {0}'.format(filepath)
     os.remove(os.path.abspath(filepath))
 
 
 def remove_resource_value(issue, filepath):
+    """
+    Read an xml file and remove an element which is unused, then save the file back to the filesystem
+    """
     for element in issue.elements:
         print 'removing {0} from resource {1}'.format(element, filepath)
         tree = ET.parse(filepath)
@@ -99,12 +109,15 @@ def remove_resource_value(issue, filepath):
 
 
 def remove_unused_resources(issues, app_dir):
+    """
+    Remove the file or the value inside the file depending if the whole file is unused or not.
+    """
     for issue in issues:
         filepath = os.path.join(app_dir, issue.filepath)
-        if issue.remove_entire_file:
-            remove_resource_file(filepath)
-        elif len(issue.elements) > 0:
+        if issue.elements:
             remove_resource_value(issue, filepath)
+        else:
+            remove_resource_file(filepath)
 
 
 if __name__ == '__main__':
