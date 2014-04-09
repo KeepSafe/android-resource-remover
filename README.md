@@ -31,5 +31,13 @@ Full path to the android app like: `d:\Dev\My_Android_App`
 
 If not provided it assumes the current directory is the app's root directory.
 
+#### --xml
+
+Use existing lint result. If provided lint won't be run.
+
+#### --ignore-layouts
+
+Ignore layout directory
+
 ## Release History
 * 2014-02-14   v0.1.0   Initial release
