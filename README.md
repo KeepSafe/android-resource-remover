@@ -8,6 +8,11 @@ Requirements:
 
 * Python >= 2.7.*
 * ADT >= 16
+* lxml == 3.3.3
+
+To install lxml run:
+
+    pip install -r requirements.txt
 
 ## Usage
 Run the script from console.
