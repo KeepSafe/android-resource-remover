@@ -8,17 +8,16 @@ Requirements:
 
 * Python >= 2.7.*
 * ADT >= 16
-* lxml == 3.3.3
 
-To install lxml run:
+To install run:
 
-    pip install -r requirements.txt
+    pip install android-resource-remover
 
 ## Usage
 Run the script from console.
 
 ```
-python clean_app.py
+python -m android_clean_app
 ```
 
 ### Options

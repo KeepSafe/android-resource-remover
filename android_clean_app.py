@@ -60,7 +60,7 @@ def parse_args():
                         help='Should ignore layouts',
                         action='store_true')
     args = parser.parse_args()
-    print args
+    print(args)
     return args.lint, args.app, args.xml, args.ignore_layouts
 
 
@@ -73,8 +73,8 @@ def run_lint_command():
         lint_result = os.path.join(app_dir, 'lint-result.xml')
         call_result = subprocess.call([lint, app_dir, '--xml', lint_result], shell=True)
         if call_result > 0:
-            print 'Running the command failed. Try running it from the console. Arguments for subprocess.call: {0}'.format(
-                [lint, app_dir, '--xml', lint_result])
+            print('Running the command failed. Try running it from the console. Arguments for subprocess.call: {0}'.format(
+                [lint, app_dir, '--xml', lint_result]))
     return lint_result, app_dir, ignore_layouts
 
 
@@ -101,7 +101,7 @@ def remove_resource_file(issue, filepath, ignore_layouts):
     Delete a file from the filesystem
     """
     if ignore_layouts is False or issue.elements[0][0] != 'layout':
-        print 'removing resource: {0}'.format(filepath)
+        print('removing resource: {0}'.format(filepath))
         os.remove(os.path.abspath(filepath))
 
 
@@ -110,7 +110,7 @@ def remove_resource_value(issue, filepath):
     Read an xml file and remove an element which is unused, then save the file back to the filesystem
     """
     for element in issue.elements:
-        print 'removing {0} from resource {1}'.format(element, filepath)
+        print('removing {0} from resource {1}'.format(element, filepath))
         parser = etree.XMLParser(remove_blank_text=False, remove_comments=False, remove_pis=False, strip_cdata=False, resolve_entities=False)
         tree = etree.parse(filepath, parser)
         root = tree.getroot()
@@ -132,7 +132,11 @@ def remove_unused_resources(issues, app_dir, ignore_layouts):
             remove_resource_value(issue, filepath)
 
 
-if __name__ == '__main__':
+def main():
     lint_result_path, app_dir, ignore_layouts = run_lint_command()
     issues = parse_lint_result(lint_result_path)
     remove_unused_resources(issues, app_dir, ignore_layouts)
+
+
+if __name__ == '__main__':
+    main()

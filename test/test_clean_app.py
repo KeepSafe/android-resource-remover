@@ -1,6 +1,6 @@
 import os
 import unittest
-import clean_app
+import android_clean_app as clean_app
 import tempfile
 import xml.etree.ElementTree as ET
 
