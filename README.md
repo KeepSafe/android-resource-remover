@@ -1,7 +1,8 @@
 android-resource-remover
 ========================
 
-A script which removes unused resources reported by [Android Lint](http://developer.android.com/tools/help/lint.html)
+android-resource-remover is utility that removes unused resources reported by [Android Lint](http://developer.android.com/tools/help/lint.html) from your project. The goal is to reduce your APK size and keep the app clean from unused stuff.
+
 
 ## Getting started
 Requirements:
@@ -13,12 +14,23 @@ To install run:
 
     pip install android-resource-remover
 
-## Usage
-Run the script from console.
+## Usage - general
+Open the directory where your app is located and run 
 
 ```
-python -m android_clean_app
+android-resource-remover
 ```
+
+Android resources have dependencies to each other. This means that after running resource-remover the first time, it will clean up unused resources file that hold a reference to other resources. You can run this resource remover multiple times until there is no more unused resources to be removed. We've been running it up to 4 times in a row.
+
+
+### Use with gradle
+`android-resource-remover` is build on top of android lint. If you have a gradle project you have to run lint within your gradle build scripts and then use the `lint-result.xml` as the input file for `android-resource-remover`
+
+e.g.
+
+    ./gradlew clean assembleDebug :lint && android-resource-remover --xml build/lint-results.xml
+
 
 ### Options
 
@@ -42,6 +54,11 @@ Use existing lint result. If provided lint won't be run.
 #### --ignore-layouts
 
 Ignore layout directory
+
+## Expected behavior 
+### Resource ID in code not found
+If you have references to elements in an old layout that you're not using anymore, you will get a compile error that the ID (`R.id.<something>`) can not be found. The reason is that the resource file that contained `R.id.<something>` has been removed as it was not used any more. Time to clean up your code.
+
 
 ## Release History
 * 2014-02-14   v0.1.0   Initial release
