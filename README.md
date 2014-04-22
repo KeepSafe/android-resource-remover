@@ -29,7 +29,7 @@ Android resources have dependencies to each other. This means that after running
 
 e.g.
 
-    ./gradlew clean assembleDebug :lint && android-resource-remover --xml build/lint-results.xml
+    ./gradlew clean build :lint && android-resource-remover --xml build/lint-results.xml
 
 
 ### Options
