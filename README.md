@@ -62,3 +62,7 @@ If you have references to elements in an old layout that you're not using anymor
 
 ## Release History
 * 2014-02-14   v0.1.0   Initial release
+
+## Licence 
+Apache version 2.0
+
