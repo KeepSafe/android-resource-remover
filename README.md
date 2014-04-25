@@ -59,6 +59,9 @@ Ignore layout directory
 ### Resource ID in code not found
 If you have references to elements in an old layout that you're not using anymore, you will get a compile error that the ID (`R.id.<something>`) can not be found. The reason is that the resource file that contained `R.id.<something>` has been removed as it was not used any more. Time to clean up your code.
 
+## FAQ
+**Q:  installing dependency lxml failed** with `clang: error: unknown argument: '-mno-fused-madd' [-Wunused-command-line-argument-hard-error-in-future]`  
+*A: [http://stackoverflow.com/a/22322645](http://stackoverflow.com/a/22322645)*
 
 ## Release History
 * 2014-02-14   v0.1.0   Initial release
