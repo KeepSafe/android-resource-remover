@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/KeepSafe/android-resource-remover.svg?branch=master)](https://travis-ci.org/KeepSafe/android-resource-remover)
+
 android-resource-remover
 ========================
 
