@@ -116,7 +116,7 @@ def remove_resource_value(issue, filepath):
         root = tree.getroot()
         for unused_value in root.findall('.//{0}[@name="{1}"]'.format(element[0], element[1])):
             root.remove(unused_value)
-        with open(filepath, 'w') as resource:
+        with open(filepath, 'wb') as resource:
             tree.write(resource, encoding='utf-8', xml_declaration=True)
 
 
