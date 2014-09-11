@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+0.1.1 (2014-09-11)
+------------------
+
+-  Fixes #5. Checks if the file exists before trying to remove it.
+
 0.1.0 (2014-02-14)
 ------------------
 

@@ -4,7 +4,7 @@ android-resource-remover
 ========================
 
 android-resource-remover is utility that removes unused resources reported by [Android Lint](http://developer.android.com/tools/help/lint.html) from your project. The goal is to reduce your APK size and keep the app clean from unused stuff.
- 
+
 
 ## Getting started
 Requirements:
@@ -17,7 +17,7 @@ To install run:
     pip install android-resource-remover
 
 ## Usage - general
-Open the directory where your app is located and run 
+Open the directory where your app is located and run
 
 ```
 android-resource-remover
@@ -57,17 +57,18 @@ Use existing lint result. If provided lint won't be run.
 
 Ignore layout directory
 
-## Expected behavior 
+## Expected behavior
 ### Resource ID in code not found
 If you have references to elements in an old layout that you're not using anymore, you will get a compile error that the ID (`R.id.<something>`) can not be found. The reason is that the resource file that contained `R.id.<something>` has been removed as it was not used any more. Time to clean up your code.
 
 ## FAQ
-**Q:  installing dependency lxml failed** with `clang: error: unknown argument: '-mno-fused-madd' [-Wunused-command-line-argument-hard-error-in-future]`  
+**Q:  installing dependency lxml failed** with `clang: error: unknown argument: '-mno-fused-madd' [-Wunused-command-line-argument-hard-error-in-future]`
 *A: [http://stackoverflow.com/a/22322645](http://stackoverflow.com/a/22322645)*
 
 ## Release History
+* 2014-09-11   v0.1.1   Fixes bugs
 * 2014-02-14   v0.1.0   Initial release
 
-## Licence 
+## Licence
 Apache version 2.0
 
