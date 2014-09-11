@@ -3,6 +3,7 @@ import unittest
 import android_clean_app as clean_app
 import tempfile
 import xml.etree.ElementTree as ET
+from unittest.mock import MagicMock, patch
 
 
 class CleanAppTestCase(unittest.TestCase):
@@ -73,6 +74,13 @@ class CleanAppTestCase(unittest.TestCase):
 
         root = ET.parse(temp_path).getroot()
         self.assertEqual(1, len(root.findall('layout')))
+
+    def test_remove_resource_file_skip_missing_files(self):
+        issue = MagicMock()
+        issue.elements = [['dummy']]
+        with patch('os.remove') as patch_remove:
+            clean_app.remove_resource_file(issue, 'dummy', False)
+            self.assertFalse(patch_remove.called)
 
 
 if __name__ == '__main__':

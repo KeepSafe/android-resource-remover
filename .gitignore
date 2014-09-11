@@ -1,4 +1,5 @@
 *.py[cod]
+venv
 
 # C extensions
 *.so
@@ -39,6 +40,11 @@ nosetests.xml
 *.pydevproject
 .project
 .metadata
+
+#Sublime
+.DS_Store
+*.sublime-project
+*.sublime-workspace
 
 # Intellij project files
 *.iml

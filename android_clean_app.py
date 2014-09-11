@@ -100,7 +100,7 @@ def remove_resource_file(issue, filepath, ignore_layouts):
     """
     Delete a file from the filesystem
     """
-    if ignore_layouts is False or issue.elements[0][0] != 'layout':
+    if os.path.exists(filepath) and (ignore_layouts is False or issue.elements[0][0] != 'layout'):
         print('removing resource: {0}'.format(filepath))
         os.remove(os.path.abspath(filepath))
 
