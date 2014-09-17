@@ -3,7 +3,7 @@ import unittest
 import android_clean_app as clean_app
 import tempfile
 import xml.etree.ElementTree as ET
-from unittest.mock import MagicMock, patch
+from mock import MagicMock, patch
 
 
 class CleanAppTestCase(unittest.TestCase):

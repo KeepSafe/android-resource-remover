@@ -60,7 +60,6 @@ def parse_args():
                         help='Should ignore layouts',
                         action='store_true')
     args = parser.parse_args()
-    print(args)
     return args.lint, args.app, args.xml, args.ignore_layouts
 
 
@@ -111,7 +110,8 @@ def remove_resource_value(issue, filepath):
     """
     for element in issue.elements:
         print('removing {0} from resource {1}'.format(element, filepath))
-        parser = etree.XMLParser(remove_blank_text=False, remove_comments=False, remove_pis=False, strip_cdata=False, resolve_entities=False)
+        parser = etree.XMLParser(remove_blank_text=False, remove_comments=False,
+                                 remove_pis=False, strip_cdata=False, resolve_entities=False)
         tree = etree.parse(filepath, parser)
         root = tree.getroot()
         for unused_value in root.findall('.//{0}[@name="{1}"]'.format(element[0], element[1])):
