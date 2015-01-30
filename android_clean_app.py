@@ -65,11 +65,11 @@ def parse_args():
 
 def run_lint_command():
     """
-    Run lint command in the shell and save results to lint-result.xml
+    Run lint command in the shell and save results to lint-results.xml
     """
     lint, app_dir, lint_result, ignore_layouts = parse_args()
     if not lint_result:
-        lint_result = os.path.join(app_dir, 'lint-result.xml')
+        lint_result = os.path.join(app_dir, 'lint-results.xml')
         call_result = subprocess.call([lint, app_dir, '--xml', lint_result], shell=True)
         if call_result > 0:
             print('Running the command failed. Try running it from the console. Arguments for subprocess.call: {0}'.format(
@@ -79,7 +79,7 @@ def run_lint_command():
 
 def parse_lint_result(lint_result_path):
     """
-    Parse lint-result.xml and create Issue for every problem found
+    Parse lint-results.xml and create Issue for every problem found
     """
     root = ET.parse(lint_result_path).getroot()
     issues = []
