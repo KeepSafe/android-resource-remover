@@ -3,6 +3,8 @@
 android-resource-remover
 ========================
 
+[![Join the chat at https://gitter.im/KeepSafe/android-resource-remover](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/KeepSafe/android-resource-remover?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 android-resource-remover is utility that removes unused resources reported by [Android Lint](http://developer.android.com/tools/help/lint.html) from your project. The goal is to reduce your APK size and keep the app clean from unused stuff.
 
 
