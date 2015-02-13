@@ -3,8 +3,6 @@
 android-resource-remover
 ========================
 
-[![Join the chat at https://gitter.im/KeepSafe/android-resource-remover](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/KeepSafe/android-resource-remover?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 android-resource-remover is utility that removes unused resources reported by [Android Lint](http://developer.android.com/tools/help/lint.html) from your project. The goal is to reduce your APK size and keep the app clean from unused stuff.
 
 
@@ -61,11 +59,19 @@ Ignore layout directory
 
 ## Expected behavior
 ### Resource ID in code not found
+
 If you have references to elements in an old layout that you're not using anymore, you will get a compile error that the ID (`R.id.<something>`) can not be found. The reason is that the resource file that contained `R.id.<something>` has been removed as it was not used any more. Time to clean up your code.
 
 ## FAQ
+
 **Q:  installing dependency lxml failed** with `clang: error: unknown argument: '-mno-fused-madd' [-Wunused-command-line-argument-hard-error-in-future]`
 *A: [http://stackoverflow.com/a/22322645](http://stackoverflow.com/a/22322645)*
+
+## Issues and PR
+
+When opening an issue please include as much info as possible. pip.log, python varsion/info, os version/info might all be help us understanding what's the problem.
+
+In PR please keep the formatting.
 
 ## Release History
 * 2014-09-11   v0.1.1   Fixes bugs
@@ -73,4 +79,3 @@ If you have references to elements in an old layout that you're not using anymor
 
 ## Licence
 Apache version 2.0
-
