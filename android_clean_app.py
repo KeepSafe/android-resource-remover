@@ -22,7 +22,7 @@ class Issue:
     """
     Stores a single issue reported by Android Lint
     """
-    pattern = re.compile('The resource (.+) appears to be unused')
+    pattern = re.compile('The resource `?([^`]+)`? appears to be unused')
 
     def __init__(self, filepath, remove_file):
         self.filepath = filepath
