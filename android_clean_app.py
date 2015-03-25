@@ -36,9 +36,13 @@ class Issue:
         return '{0} {1}'.format(self.filepath)
 
     def add_element(self, message):
-        res = re.findall(Issue.pattern, message)[0]
-        bits = res.split('.')[-2:]
-        self.elements.append((bits[0], bits[1]))
+        res_all = re.findall(Issue.pattern, message)
+        if res_all:
+            res = res_all[0]
+            bits = res.split('.')[-2:]
+            self.elements.append((bits[0], bits[1]))
+        else:
+            print("The pattern '%s' seems to find nothing in the error message '%s'. We can't find the resource and can't remove it. The pattern might have changed, please check and report this in github issues." % (Issue.pattern, message))
 
 
 def parse_args():
