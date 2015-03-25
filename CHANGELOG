@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+0.1.2 (2015-03-25)
+------------------
+
+-  Fixes #9. Supports new missing resource message pattern.
+
+
 0.1.1 (2014-09-11)
 ------------------
 
