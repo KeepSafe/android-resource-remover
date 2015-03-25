@@ -39,7 +39,7 @@ class CleanAppTestCase(unittest.TestCase):
         with self.assertRaises(IOError):
             open(temp_path)
 
-    def test_removes_an_unused_value_from_a_file(self):
+    def _removes_an_unused_value_from_a_file(self, message, expected_elements_count=2):
         temp, temp_path = tempfile.mkstemp()
         os.write(temp, """
             <resources>
@@ -51,11 +51,23 @@ class CleanAppTestCase(unittest.TestCase):
         os.close(temp)
 
         issue = clean_app.Issue(temp_path, False)
-        issue.add_element('The resource R.string.missing appears to be unused')
+        issue.add_element(message)
         clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), True)
 
         root = ET.parse(temp_path).getroot()
-        self.assertEqual(2, len(root.findall('string')))
+        self.assertEqual(expected_elements_count, len(root.findall('string')))
+        
+    def test_removes_an_unused_value_from_a_file_old_format(self):
+        message = 'The resource R.string.missing appears to be unused'
+        self._removes_an_unused_value_from_a_file(message)
+        
+    def test_removes_an_unused_value_from_a_file_new_format(self):
+        message = 'The resource `R.string.missing` appears to be unused'
+        self._removes_an_unused_value_from_a_file(message)
+
+    def test_handle_incorrect_missing_resource_pattern(self):
+        message = 'Wrong pattern !!!'
+        self._removes_an_unused_value_from_a_file(message, 3)    
 
     def test_ignores_layouts(self):
         temp, temp_path = tempfile.mkstemp()
