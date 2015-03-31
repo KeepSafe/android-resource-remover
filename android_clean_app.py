@@ -42,7 +42,8 @@ class Issue:
             bits = res.split('.')[-2:]
             self.elements.append((bits[0], bits[1]))
         else:
-            print("The pattern '%s' seems to find nothing in the error message '%s'. We can't find the resource and can't remove it. The pattern might have changed, please check and report this in github issues." % (Issue.pattern, message))
+            print("The pattern '%s' seems to find nothing in the error message '%s'. We can't find the resource and can't remove it. The pattern might have changed, please check and report this in github issues." % (
+                Issue.pattern, message))
 
 
 def parse_args():
@@ -74,10 +75,10 @@ def run_lint_command():
     lint, app_dir, lint_result, ignore_layouts = parse_args()
     if not lint_result:
         lint_result = os.path.join(app_dir, 'lint-result.xml')
-        call_result = subprocess.call([lint, app_dir, '--xml', lint_result], shell=True)
+        call_result = subprocess.call([lint, app_dir, '--xml', lint_result])
         if call_result > 0:
-            print('Running the command failed. Try running it from the console. Arguments for subprocess.call: {0}'.format(
-                [lint, app_dir, '--xml', lint_result]))
+            print('Running the command failed with result {}. Try running it from the console. Arguments for subprocess.call: {}'.format(
+                call_result, [lint, app_dir, '--xml', lint_result]))
     return lint_result, app_dir, ignore_layouts
 
 
