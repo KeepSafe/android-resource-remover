@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import unittest
 import android_clean_app as clean_app
