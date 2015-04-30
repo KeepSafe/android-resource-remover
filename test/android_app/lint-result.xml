@@ -1,118 +1,210 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="4" by="lint 22.3">
+<issues format="4" by="lint 24.1.2">
 
     <issue
-        id="UnusedResources"
-        severity="Warning"
-        message="The resource R.anim.anim_missing appears to be unused"
-        category="Performance"
-        priority="3"
-        summary="Looks for unused resources"
-        explanation="Unused resources make applications larger and slow down builds.">
+        id="LintError"
+        severity="Error"
+        message="Can&apos;t find API database; API check not performed"
+        category="Lint"
+        priority="10"
+        summary="Lint Failure"
+        explanation="This issue type represents a problem running lint itself. Examples include failure to find bytecode for source files (which means certain detectors could not be run), parsing errors in lint configuration files, etc.
+These errors are not errors in your own code, but they are shown to make it clear that some checks were not completed.">
         <location
-            file="res\anim\anim_missing.xml"/>
+            file="."/>
+    </issue>
+
+    <issue
+        id="LintError"
+        severity="Error"
+        message="No `.class` files were found in project &quot;.&quot;, so none of the classfile based checks could be run. Does the project need to be built first?"
+        category="Lint"
+        priority="10"
+        summary="Lint Failure"
+        explanation="This issue type represents a problem running lint itself. Examples include failure to find bytecode for source files (which means certain detectors could not be run), parsing errors in lint configuration files, etc.
+These errors are not errors in your own code, but they are shown to make it clear that some checks were not completed.">
+        <location
+            file="."/>
+    </issue>
+
+    <issue
+        id="OldTargetApi"
+        severity="Warning"
+        message="Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the `android.os.Build.VERSION_CODES` javadoc for details."
+        category="Correctness"
+        priority="6"
+        summary="Target SDK attribute is not targeting latest version"
+        explanation="When your application runs on a version of Android that is more recent than your `targetSdkVersion` specifies that it has been tested with, various compatibility modes kick in. This ensures that your application continues to work, but it may look out of place. For example, if the `targetSdkVersion` is less than 14, your app may get an option button in the UI.
+
+To fix this issue, set the `targetSdkVersion` to the highest available value. Then test your app to make sure everything works correctly. You may want to consult the compatibility notes to see what changes apply to each version you are adding support for: http://developer.android.com/reference/android/os/Build.VERSION_CODES.html"
+        url="http://developer.android.com/reference/android/os/Build.VERSION_CODES.html"
+        urls="http://developer.android.com/reference/android/os/Build.VERSION_CODES.html"
+        errorLine1="    &lt;uses-sdk android:minSdkVersion=&quot;16&quot; android:targetSdkVersion=&quot;19&quot;/>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        quickfix="studio">
+        <location
+            file="AndroidManifest.xml"
+            line="6"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="PropertyEscape"
+        severity="Error"
+        message="Windows file separators (`\`) and drive letter separators (&apos;:&apos;) must be escaped (`\\`) in property files; use D\:\\Dev\\Android SDK"
+        category="Correctness"
+        priority="6"
+        summary="Incorrect property escapes"
+        explanation="All backslashes and colons in .property files must be escaped with a backslash (\). This means that when writing a Windows path, you must escape the file separators, so the path \My\Files should be written as `key=\\My\\Files.`"
+        errorLine1="sdk.dir=D:\\Dev\\Android SDK"
+        errorLine2="         ~"
+        quickfix="studio">
+        <location
+            file="local.properties"
+            line="10"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ExtraTranslation"
+        severity="Fatal"
+        message="&quot;`extra_translation`&quot; is translated here but not found in default locale"
+        category="Correctness:Messages"
+        priority="6"
+        summary="Extra translation"
+        explanation="If a string appears in a specific language translation file, but there is no corresponding string in the default locale, then this string is probably unused. (It&apos;s technically possible that your application is only intended to run in a specific locale, but it&apos;s still a good idea to provide a fallback.).
+
+Note that these strings can lead to crashes if the string is looked up on any locale not providing a translation, so it&apos;s important to clean them up."
+        errorLine1="    &lt;string name=&quot;extra_translation&quot;>missing&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="res/values-fr/strings.xml"
+            line="5"
+            column="13"/>
     </issue>
 
     <issue
         id="UnusedResources"
         severity="Warning"
-        message="The resource R.animator.animator_missing appears to be unused"
+        message="The resource `R.anim.anim_missing` appears to be unused"
         category="Performance"
         priority="3"
-        summary="Looks for unused resources"
+        summary="Unused resources"
         explanation="Unused resources make applications larger and slow down builds.">
         <location
-            file="res\animator\animator_missing.xml"/>
+            file="res/anim/anim_missing.xml"/>
     </issue>
 
     <issue
         id="UnusedResources"
         severity="Warning"
-        message="The resource R.color.color_missing appears to be unused"
+        message="The resource `R.animator.animator_missing` appears to be unused"
         category="Performance"
         priority="3"
-        summary="Looks for unused resources"
+        summary="Unused resources"
         explanation="Unused resources make applications larger and slow down builds.">
         <location
-            file="res\color\color_missing.xml"/>
+            file="res/animator/animator_missing.xml"/>
     </issue>
 
     <issue
         id="UnusedResources"
         severity="Warning"
-        message="The resource R.drawable.drawable_missing appears to be unused"
+        message="The resource `R.color.color_missing` appears to be unused"
         category="Performance"
         priority="3"
-        summary="Looks for unused resources"
+        summary="Unused resources"
         explanation="Unused resources make applications larger and slow down builds.">
         <location
-            file="res\drawable\drawable_missing.xml"/>
+            file="res/color/color_missing.xml"/>
     </issue>
 
     <issue
         id="UnusedResources"
         severity="Warning"
-        message="The resource R.drawable.ic_launcher appears to be unused"
+        message="The resource `R.dimen.missing_dimen` appears to be unused"
         category="Performance"
         priority="3"
-        summary="Looks for unused resources"
-        explanation="Unused resources make applications larger and slow down builds.">
-        <location
-            file="res\drawable-hdpi\ic_launcher.png"/>
-        <location
-            file="res\drawable-ldpi\ic_launcher.png"/>
-        <location
-            file="res\drawable-mdpi\ic_launcher.png"/>
-        <location
-            file="res\drawable-xhdpi\ic_launcher.png"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        severity="Warning"
-        message="The resource R.drawable.missing appears to be unused"
-        category="Performance"
-        priority="3"
-        summary="Looks for unused resources"
+        summary="Unused resources"
         explanation="Unused resources make applications larger and slow down builds."
-    />
-
-    <issue
-        id="UnusedResources"
-        severity="Warning"
-        message="The resource R.layout.layout_missing appears to be unused"
-        category="Performance"
-        priority="3"
-        summary="Looks for unused resources"
-        explanation="Unused resources make applications larger and slow down builds.">
+        errorLine1="    &lt;dimen name=&quot;missing_dimen&quot;>180dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="res\layout\layout_missing.xml"/>
+            file="res/values/dimens.xml"
+            line="4"
+            column="12"/>
     </issue>
 
     <issue
         id="UnusedResources"
         severity="Warning"
-        message="The resource R.menu.menu_missing appears to be unused"
+        message="The resource `R.drawable.drawable_missing` appears to be unused"
         category="Performance"
         priority="3"
-        summary="Looks for unused resources"
+        summary="Unused resources"
         explanation="Unused resources make applications larger and slow down builds.">
         <location
-            file="res\menu\menu_missing.xml"/>
+            file="res/drawable/drawable_missing.xml"/>
     </issue>
 
     <issue
         id="UnusedResources"
         severity="Warning"
-        message="The resource R.string.missing appears to be unused"
+        message="The resource `R.drawable.ic_launcher` appears to be unused"
         category="Performance"
         priority="3"
-        summary="Looks for unused resources"
+        summary="Unused resources"
+        explanation="Unused resources make applications larger and slow down builds.">
+        <location
+            file="res/drawable-hdpi/ic_launcher.png"/>
+        <location
+            file="res/drawable-ldpi/ic_launcher.png"/>
+        <location
+            file="res/drawable-mdpi/ic_launcher.png"/>
+        <location
+            file="res/drawable-xhdpi/ic_launcher.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        severity="Warning"
+        message="The resource `R.layout.layout_missing` appears to be unused"
+        category="Performance"
+        priority="3"
+        summary="Unused resources"
+        explanation="Unused resources make applications larger and slow down builds.">
+        <location
+            file="res/layout/layout_missing.xml"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        severity="Warning"
+        message="The resource `R.menu.menu_missing` appears to be unused"
+        category="Performance"
+        priority="3"
+        summary="Unused resources"
+        explanation="Unused resources make applications larger and slow down builds.">
+        <location
+            file="res/menu/menu_missing.xml"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        severity="Warning"
+        message="The resource `R.string.missing` appears to be unused"
+        category="Performance"
+        priority="3"
+        summary="Unused resources"
         explanation="Unused resources make applications larger and slow down builds."
-        errorLine1="    &lt;string name=&quot;missing&quot;>missing&lt;/string>"
+        errorLine1="    &lt;string name=&quot;missing&quot;>missing&lt;/string>"
         errorLine2="            ~~~~~~~~~~~~~~">
         <location
-            file="res\values\strings.xml"
+            file="res/values/strings.xml"
+            line="4"
+            column="13"/>
+        <location
+            file="res/values-fr/strings.xml"
             line="4"
             column="13"/>
     </issue>
@@ -120,31 +212,73 @@
     <issue
         id="UnusedResources"
         severity="Warning"
-        message="The resource R.xml.xml_missing appears to be unused"
+        message="The resource `R.string.extra_translation` appears to be unused"
         category="Performance"
         priority="3"
-        summary="Looks for unused resources"
+        summary="Unused resources"
+        explanation="Unused resources make applications larger and slow down builds."
+        errorLine1="    &lt;string name=&quot;extra_translation&quot;>missing&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="res/values-fr/strings.xml"
+            line="5"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        severity="Warning"
+        message="The resource `R.xml.xml_missing` appears to be unused"
+        category="Performance"
+        priority="3"
+        summary="Unused resources"
         explanation="Unused resources make applications larger and slow down builds.">
         <location
-            file="res\xml\xml_missing.xml"/>
+            file="res/xml/xml_missing.xml"/>
     </issue>
+
+    <issue
+        id="UnusedResources"
+        severity="Warning"
+        message="The resource `R.drawable.missing` appears to be unused"
+        category="Performance"
+        priority="3"
+        summary="Unused resources"
+        explanation="Unused resources make applications larger and slow down builds."
+    />
 
     <issue
         id="MissingApplicationIcon"
         severity="Warning"
-        message="Should explicitly set android:icon, there is no default"
+        message="Should explicitly set `android:icon`, there is no default"
         category="Usability:Icons"
         priority="5"
-        summary="Checks that the application icon is set"
+        summary="Missing application icon"
         explanation="You should set an icon for the application as whole because there is no default. This attribute must be set as a reference to a drawable resource containing the image (for example `@drawable/icon`)."
         url="http://developer.android.com/tools/publishing/preparing.html#publishing-configure"
         urls="http://developer.android.com/tools/publishing/preparing.html#publishing-configure"
-        errorLine1="    &lt;application android:label=&quot;@string/app_name&quot; android:allowBackup=&quot;false&quot;>"
-        errorLine2="    ^">
+        errorLine1="    &lt;application android:label=&quot;@string/app_name&quot; android:allowBackup=&quot;false&quot;>"
+        errorLine2="    ^"
+        quickfix="studio">
         <location
             file="AndroidManifest.xml"
             line="7"
             column="5"/>
+    </issue>
+
+    <issue
+        id="IconMissingDensityFolder"
+        severity="Warning"
+        message="Missing density variation folders in `res`: drawable-xxhdpi, drawable-xxxhdpi"
+        category="Usability:Icons"
+        priority="3"
+        summary="Missing density folder"
+        explanation="Icons will look best if a custom version is provided for each of the major screen density classes (low, medium, high, extra-high, extra-extra-high). This lint check identifies folders which are missing, such as `drawable-hdpi`.
+Low density is not really used much anymore, so this check ignores the ldpi density. To force lint to include it, set the environment variable `ANDROID_LINT_INCLUDE_LDPI=true`. For more information on current density usage, see http://developer.android.com/resources/dashboard/screens.html"
+        url="http://developer.android.com/guide/practices/screens_support.html"
+        urls="http://developer.android.com/guide/practices/screens_support.html">
+        <location
+            file="res"/>
     </issue>
 
 </issues>

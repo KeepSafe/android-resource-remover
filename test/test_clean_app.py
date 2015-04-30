@@ -7,9 +7,10 @@ from mock import MagicMock, patch
 
 
 class CleanAppTestCase(unittest.TestCase):
+
     def test_reads_all_unused_resource_issues(self):
         actual = clean_app.parse_lint_result('./test/android_app/lint-result.xml')
-        self.assertEqual(12, len(actual))
+        self.assertEqual(15, len(actual))
 
     def test_marks_resource_as_save_to_remove(self):
         actual = clean_app.parse_lint_result('./test/android_app/lint-result.xml')
@@ -19,13 +20,13 @@ class CleanAppTestCase(unittest.TestCase):
     def test_marks_resource_as_not_save_to_remove_if_it_has_used_values(self):
         actual = clean_app.parse_lint_result('./test/android_app/lint-result.xml')
         not_remove_entire_file = list(filter(lambda issue: not issue.remove_file, actual))
-        self.assertEqual(1, len(not_remove_entire_file))
+        self.assertEqual(4, len(not_remove_entire_file))
 
     def test_extracts_correct_info_from_resource(self):
         issues = clean_app.parse_lint_result('./test/android_app/lint-result.xml')
         not_remove_entire_file = list(filter(lambda issue: not issue.remove_file, issues))
-        actual = not_remove_entire_file[0]
-        self.assertEqual('res\\values\\strings.xml', actual.filepath)
+        actual = list(filter(lambda issue: os.path.normpath(issue.filepath) == os.path.normpath(
+            'res/values/strings.xml'), not_remove_entire_file))[0]
         self.assertGreater(len(actual.elements), 0)
         self.assertEqual(('string', 'missing'), actual.elements[0])
 
@@ -56,18 +57,18 @@ class CleanAppTestCase(unittest.TestCase):
 
         root = ET.parse(temp_path).getroot()
         self.assertEqual(expected_elements_count, len(root.findall('string')))
-        
+
     def test_removes_an_unused_value_from_a_file_old_format(self):
         message = 'The resource R.string.missing appears to be unused'
         self._removes_an_unused_value_from_a_file(message)
-        
+
     def test_removes_an_unused_value_from_a_file_new_format(self):
         message = 'The resource `R.string.missing` appears to be unused'
         self._removes_an_unused_value_from_a_file(message)
 
     def test_handle_incorrect_missing_resource_pattern(self):
         message = 'Wrong pattern !!!'
-        self._removes_an_unused_value_from_a_file(message, 3)    
+        self._removes_an_unused_value_from_a_file(message, 3)
 
     def test_ignores_layouts(self):
         temp, temp_path = tempfile.mkstemp()
