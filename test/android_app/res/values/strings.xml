@@ -2,4 +2,8 @@
 <resources>
     <string name="app_name">android_app</string>
     <string name="missing">missing</string>
+    <string-array name="missing_array">
+        <item>Test1</item>
+        <item>Test2</item>
+    </string-array>
 </resources>

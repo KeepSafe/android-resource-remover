@@ -23,6 +23,7 @@ class Issue:
     Stores a single issue reported by Android Lint
     """
     pattern = re.compile('The resource `?([^`]+)`? appears to be unused')
+    pattern_array = re.compile('<`?([^`]+)`? name="`?([^`]+)`?">')
 
     def __init__(self, filepath, remove_file):
         self.filepath = filepath
@@ -35,12 +36,18 @@ class Issue:
     def __repr__(self):
         return '{0} {1}'.format(self.filepath)
 
-    def add_element(self, message):
+    def add_element(self, message, errorLine1):
         res_all = re.findall(Issue.pattern, message)
         if res_all:
             res = res_all[0]
             bits = res.split('.')[-2:]
-            self.elements.append((bits[0], bits[1]))
+            if bits[0] != 'array':
+               type = bits[0]
+            else:
+                # array is a generic type, which may take form string-array, integer-array, etc. 
+                # The only way to get type is to parse from errorLine1 which is less reliable than message.
+               type = re.findall(Issue.pattern_array, errorLine1)[0][0]
+            self.elements.append((type, bits[1]))
         else:
             print("The pattern '%s' seems to find nothing in the error message '%s'. We can't find the resource and can't remove it. The pattern might have changed, please check and report this in github issues." % (
                 Issue.pattern, message))
@@ -95,7 +102,7 @@ def parse_lint_result(lint_result_path):
             # TODO stop guessing
             remove_entire_file = (location.get('line') or location.get('column')) is None
             issue = Issue(filepath, remove_entire_file)
-            issue.add_element(issue_xml.get('message'))
+            issue.add_element(issue_xml.get('message'), issue_xml.get('errorLine1'))
             issues.append(issue)
     return issues
 
