@@ -119,8 +119,9 @@ def remove_resource_value(issue, filepath):
                                  remove_pis=False, strip_cdata=False, resolve_entities=False)
         tree = etree.parse(filepath, parser)
         root = tree.getroot()
-        for unused_value in root.findall('.//{0}[@name="{1}"]'.format(element[0], element[1])):
-            root.remove(unused_value)
+        for unused_value in root.findall(element[0]):
+            if unused_value.get('name') == element[1]:
+                root.remove(unused_value)
         with open(filepath, 'wb') as resource:
             tree.write(resource, encoding='utf-8', xml_declaration=True)
 
