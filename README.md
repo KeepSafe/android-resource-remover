@@ -74,6 +74,7 @@ When opening an issue please include as much info as possible. pip.log, python v
 In PR please keep the formatting.
 
 ## Release History
+* 2015-05-21   v0.1.4   Fixes bugs
 * 2015-03-31   v0.1.3   Fixes bugs
 * 2015-03-25   v0.1.2   Fixes bugs
 * 2014-09-11   v0.1.1   Fixes bugs
