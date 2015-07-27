@@ -95,6 +95,16 @@ class CleanAppTestCase(unittest.TestCase):
             clean_app.remove_resource_file(issue, 'dummy', False)
             self.assertFalse(patch_remove.called)
 
+    def test_remove_value_only_if_the_file_still_exists(self):
+        temp, temp_path = tempfile.mkstemp()
+        os.close(temp)
+        os.remove(temp_path)
+
+        issue = clean_app.Issue(temp_path, False)
+        issue.add_element('The resource `R.drawable.drawable_missing` appears to be unused')
+
+        clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), False)
+
 
 if __name__ == '__main__':
     unittest.main()

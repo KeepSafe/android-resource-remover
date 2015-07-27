@@ -13,7 +13,6 @@ import argparse
 import os
 import re
 import subprocess
-import xml.etree.ElementTree as ET
 from lxml import etree
 
 
@@ -30,10 +29,10 @@ class Issue:
         self.elements = []
 
     def __str__(self):
-        return '{0} {1}'.format(self.filepath)
+        return '{0} {1}'.format(self.filepath, self.elements)
 
     def __repr__(self):
-        return '{0} {1}'.format(self.filepath)
+        return '{0} {1}'.format(self.filepath, self.elements)
 
     def add_element(self, message):
         res_all = re.findall(Issue.pattern, message)
@@ -86,7 +85,7 @@ def parse_lint_result(lint_result_path):
     """
     Parse lint-result.xml and create Issue for every problem found
     """
-    root = ET.parse(lint_result_path).getroot()
+    root = etree.parse(lint_result_path).getroot()
     issues = []
     for issue_xml in root.findall('.//issue[@id="UnusedResources"]'):
         for location in issue_xml.findall('location'):
@@ -113,16 +112,17 @@ def remove_resource_value(issue, filepath):
     """
     Read an xml file and remove an element which is unused, then save the file back to the filesystem
     """
-    for element in issue.elements:
-        print('removing {0} from resource {1}'.format(element, filepath))
-        parser = etree.XMLParser(remove_blank_text=False, remove_comments=False,
-                                 remove_pis=False, strip_cdata=False, resolve_entities=False)
-        tree = etree.parse(filepath, parser)
-        root = tree.getroot()
-        for unused_value in root.findall('.//{0}[@name="{1}"]'.format(element[0], element[1])):
-            root.remove(unused_value)
-        with open(filepath, 'wb') as resource:
-            tree.write(resource, encoding='utf-8', xml_declaration=True)
+    if os.path.exists(filepath):
+        for element in issue.elements:
+            print('removing {0} from resource {1}'.format(element, filepath))
+            parser = etree.XMLParser(remove_blank_text=False, remove_comments=False,
+                                     remove_pis=False, strip_cdata=False, resolve_entities=False)
+            tree = etree.parse(filepath, parser)
+            root = tree.getroot()
+            for unused_value in root.findall('.//{0}[@name="{1}"]'.format(element[0], element[1])):
+                root.remove(unused_value)
+            with open(filepath, 'wb') as resource:
+                tree.write(resource, encoding='utf-8', xml_declaration=True)
 
 
 def remove_unused_resources(issues, app_dir, ignore_layouts):
