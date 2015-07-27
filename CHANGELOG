@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+0.1.5 (2015-07-27)
+------------------
+
+- Check if the file exists before removing values.
+
+
 0.1.4 (2015-05-21)
 ------------------
 
