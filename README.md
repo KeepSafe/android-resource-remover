@@ -57,6 +57,18 @@ Use existing lint result. If provided lint won't be run.
 
 Ignore layout directory
 
+#### --ignore-drawables
+
+Ignore drawables
+
+#### --ignore-dimens
+
+Ignore dimensions
+
+#### --strings-only
+
+Clean unused strings only
+
 ## Expected behavior
 ### Resource ID in code not found
 
