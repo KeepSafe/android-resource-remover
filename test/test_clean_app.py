@@ -9,21 +9,21 @@ from mock import MagicMock, patch
 class CleanAppTestCase(unittest.TestCase):
 
     def test_reads_all_unused_resource_issues(self):
-        actual = clean_app.parse_lint_result('./android_app/lint-result.xml')
+        actual = clean_app.parse_lint_result('./test/android_app/lint-result.xml')
         self.assertEqual(15, len(actual))
 
     def test_marks_resource_as_save_to_remove(self):
-        actual = clean_app.parse_lint_result('./android_app/lint-result.xml')
+        actual = clean_app.parse_lint_result('./test/android_app/lint-result.xml')
         remove_entire_file = list(filter(lambda issue: issue.remove_file, actual))
         self.assertEqual(11, len(remove_entire_file))
 
     def test_marks_resource_as_not_save_to_remove_if_it_has_used_values(self):
-        actual = clean_app.parse_lint_result('./android_app/lint-result.xml')
+        actual = clean_app.parse_lint_result('./test/android_app/lint-result.xml')
         not_remove_entire_file = list(filter(lambda issue: not issue.remove_file, actual))
         self.assertEqual(4, len(not_remove_entire_file))
 
     def test_extracts_correct_info_from_resource(self):
-        issues = clean_app.parse_lint_result('./android_app/lint-result.xml')
+        issues = clean_app.parse_lint_result('./test/android_app/lint-result.xml')
         not_remove_entire_file = list(filter(lambda issue: not issue.remove_file, issues))
         actual = list(filter(lambda issue: os.path.normpath(issue.filepath) == os.path.normpath(
             'res/values/strings.xml'), not_remove_entire_file))[0]
