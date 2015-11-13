@@ -36,7 +36,7 @@ class CleanAppTestCase(unittest.TestCase):
 
         issue = clean_app.Issue(temp_path, True)
 
-        clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), False)
+        clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), False, False, False, False)
         with self.assertRaises(IOError):
             open(temp_path)
 
@@ -53,7 +53,7 @@ class CleanAppTestCase(unittest.TestCase):
 
         issue = clean_app.Issue(temp_path, False)
         issue.add_element(message)
-        clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), True)
+        clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), True, False, False, True)
 
         root = ET.parse(temp_path).getroot()
         self.assertEqual(expected_elements_count, len(root.findall('string')))
@@ -83,7 +83,7 @@ class CleanAppTestCase(unittest.TestCase):
 
         issue = clean_app.Issue(temp_path, False)
         issue.add_element('The resource R.string.missing appears to be unused')
-        clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), False)
+        clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), False, False, False, False)
 
         root = ET.parse(temp_path).getroot()
         self.assertEqual(1, len(root.findall('layout')))
@@ -92,7 +92,7 @@ class CleanAppTestCase(unittest.TestCase):
         issue = MagicMock()
         issue.elements = [['dummy']]
         with patch('os.remove') as patch_remove:
-            clean_app.remove_resource_file(issue, 'dummy', False)
+            clean_app.remove_resource_file(issue, 'dummy', False, False)
             self.assertFalse(patch_remove.called)
 
     def test_remove_value_only_if_the_file_still_exists(self):
@@ -103,8 +103,48 @@ class CleanAppTestCase(unittest.TestCase):
         issue = clean_app.Issue(temp_path, False)
         issue.add_element('The resource `R.drawable.drawable_missing` appears to be unused')
 
-        clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), False)
+        clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), False, False, False, False)
 
+
+    def test_ignores_drawables(self):
+        temp, temp_path = tempfile.mkstemp()
+        os.write(temp, """
+            <resources>
+                <string name="string1">string1</string>
+                <drawable name="missing">missing</drawable>
+                <drawable name="drawable2">drawable2</drawable>
+                <layout name="layout">layout</layout>
+            </resources>
+        """.encode('UTF-8'))
+        os.close(temp)
+
+        issue = clean_app.Issue(temp_path, False)
+        issue.add_element('The resource R.drawable.missing appears to be unused')
+        issue.add_element('The resource R.layout.layout appears to be unused')
+        clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), False, True)
+
+        root = ET.parse(temp_path).getroot()
+        self.assertEqual(2, len(root.findall('drawable')))
+
+    def test_ignores_dimens(self):
+        temp, temp_path = tempfile.mkstemp()
+        os.write(temp, """
+            <resources>
+                <dimen name="large">large</dimen>
+                <dimen name="missing">missing</dimen>
+                <drawable name="drawable2">drawable2</drawable>
+                <layout name="layout">layout</layout>
+            </resources>
+        """.encode('UTF-8'))
+        os.close(temp)
+
+        issue = clean_app.Issue(temp_path, False)
+        issue.add_element('The resource R.dimen.missing appears to be unused')
+        issue.add_element('The resource R.layout.layout appears to be unused')
+        clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), False, False, True)
+
+        root = ET.parse(temp_path).getroot()
+        self.assertEqual(2, len(root.findall('dimen')))
 
 if __name__ == '__main__':
     unittest.main()

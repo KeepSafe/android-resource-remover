@@ -17,7 +17,6 @@ from lxml import etree
 
 
 class Issue:
-
     """
     Stores a single issue reported by Android Lint
     """
@@ -41,7 +40,8 @@ class Issue:
             bits = res.split('.')[-2:]
             self.elements.append((bits[0], bits[1]))
         else:
-            print("The pattern '%s' seems to find nothing in the error message '%s'. We can't find the resource and can't remove it. The pattern might have changed, please check and report this in github issues." % (
+            print(
+            "The pattern '%s' seems to find nothing in the error message '%s'. We can't find the resource and can't remove it. The pattern might have changed, please check and report this in github issues." % (
                 Issue.pattern, message))
 
 
@@ -63,22 +63,32 @@ def parse_args():
     parser.add_argument('--ignore-layouts',
                         help='Should ignore layouts',
                         action='store_true')
+    parser.add_argument('--ignore-drawables',
+                        help='Should ignore drawables',
+                        action='store_true')
+    parser.add_argument('--ignore-dimens',
+                        help='Should ignore dimensions',
+                        action='store_true')
+    parser.add_argument('--strings-only',
+                        help='Should remove unused strings only',
+                        action='store_true')
     args = parser.parse_args()
-    return args.lint, args.app, args.xml, args.ignore_layouts
+    return args.lint, args.app, args.xml, args.ignore_layouts, args.ignore_drawables, args.ignore_dimens, args.strings_only
 
 
 def run_lint_command():
     """
     Run lint command in the shell and save results to lint-result.xml
     """
-    lint, app_dir, lint_result, ignore_layouts = parse_args()
+    lint, app_dir, lint_result, ignore_layouts, ignore_drawables, ignore_dimens, strings_only = parse_args()
     if not lint_result:
         lint_result = os.path.join(app_dir, 'lint-result.xml')
         call_result = subprocess.call([lint, app_dir, '--xml', lint_result])
         if call_result > 0:
-            print('Running the command failed with result {}. Try running it from the console. Arguments for subprocess.call: {}'.format(
+            print(
+            'Running the command failed with result {}. Try running it from the console. Arguments for subprocess.call: {}'.format(
                 call_result, [lint, app_dir, '--xml', lint_result]))
-    return lint_result, app_dir, ignore_layouts
+    return lint_result, app_dir, ignore_layouts, ignore_drawables, ignore_dimens, strings_only
 
 
 def parse_lint_result(lint_result_path):
@@ -99,48 +109,57 @@ def parse_lint_result(lint_result_path):
     return issues
 
 
-def remove_resource_file(issue, filepath, ignore_layouts):
+def remove_resource_file(issue, filepath, ignore_layouts, ignore_drawables=False):
     """
     Delete a file from the filesystem
+    :param ignore_layouts: True to ignore removing layout files, False to remove them
+    :param ignore_drawables: True to ignore removing drawable files, False to remove them
     """
-    if os.path.exists(filepath) and (ignore_layouts is False or issue.elements[0][0] != 'layout'):
+
+    if os.path.exists(filepath) and (ignore_layouts is False or issue.elements[0][0] != 'layout') and (
+            ignore_drawables is False or issue.elements[0][0] != 'drawable'):
         print('removing resource: {0}'.format(filepath))
         os.remove(os.path.abspath(filepath))
 
 
-def remove_resource_value(issue, filepath):
+def remove_resource_value(issue, filepath, ignore_dimens=False, ignore_drawables=False):
     """
     Read an xml file and remove an element which is unused, then save the file back to the filesystem
+    :param ignore_dimens: True to ignore removing dimensions, False to remove them
+    :param ignore_drawables: True to ignore removing drawables, False to remove them
     """
     if os.path.exists(filepath):
         for element in issue.elements:
-            print('removing {0} from resource {1}'.format(element, filepath))
-            parser = etree.XMLParser(remove_blank_text=False, remove_comments=False,
-                                     remove_pis=False, strip_cdata=False, resolve_entities=False)
-            tree = etree.parse(filepath, parser)
-            root = tree.getroot()
-            for unused_value in root.findall('.//{0}[@name="{1}"]'.format(element[0], element[1])):
-                root.remove(unused_value)
-            with open(filepath, 'wb') as resource:
-                tree.write(resource, encoding='utf-8', xml_declaration=True)
+            if ignore_dimens is False and ignore_drawables is False or (
+                    element[0] != 'dimen' and element[0] != 'drawable'):
+                print('removing {0} from resource {1}'.format(element, filepath))
+                parser = etree.XMLParser(remove_blank_text=False, remove_comments=False,
+                                         remove_pis=False, strip_cdata=False, resolve_entities=False)
+                tree = etree.parse(filepath, parser)
+                root = tree.getroot()
+                for unused_value in root.findall('.//{0}[@name="{1}"]'.format(element[0], element[1])):
+                    root.remove(unused_value)
+                with open(filepath, 'wb') as resource:
+                    tree.write(resource, encoding='utf-8', xml_declaration=True)
 
 
-def remove_unused_resources(issues, app_dir, ignore_layouts):
+def remove_unused_resources(issues, app_dir, ignore_layouts, ignore_drawables=False, ignore_dimens=False,
+                            strings_only=False):
     """
     Remove the file or the value inside the file depending if the whole file is unused or not.
     """
     for issue in issues:
         filepath = os.path.join(app_dir, issue.filepath)
-        if issue.remove_file:
-            remove_resource_file(issue, filepath, ignore_layouts)
+        if issue.remove_file and strings_only is False:
+            remove_resource_file(issue, filepath, ignore_layouts, ignore_drawables)
         else:
-            remove_resource_value(issue, filepath)
+            remove_resource_value(issue, filepath, ignore_dimens, ignore_drawables)
 
 
 def main():
-    lint_result_path, app_dir, ignore_layouts = run_lint_command()
+    lint_result_path, app_dir, ignore_layouts, ignore_drawables, ignore_dimens, strings_only = run_lint_command()
     issues = parse_lint_result(lint_result_path)
-    remove_unused_resources(issues, app_dir, ignore_layouts)
+    remove_unused_resources(issues, app_dir, ignore_layouts, ignore_drawables, ignore_dimens, strings_only)
 
 
 if __name__ == '__main__':
