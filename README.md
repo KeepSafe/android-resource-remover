@@ -65,10 +65,10 @@ If you have references to elements in an old layout that you're not using anymor
 
 ## FAQ
 
-**Q:  installing dependency lxml failed** with `clang: error: unknown argument: '-mno-fused-madd' [-Wunused-command-line-argument-hard-error-in-future]`
+**Q:  installing dependency lxml failed** with `clang: error: unknown argument: '-mno-fused-madd' [-Wunused-command-line-argument-hard-error-in-future]`  
 *A: [http://stackoverflow.com/a/22322645](http://stackoverflow.com/a/22322645)*
 
-**Q:  installing dependency lxml failed** with `fatal error: 'libxml/xmlversion.h' file not found`
+**Q:  installing dependency lxml failed** with `fatal error: 'libxml/xmlversion.h' file not found`  
 *A: There are several ways to fix this listed on stackoverflow  [http://stackoverflow.com/questions/19548011/cannot-install-lxml-on-mac-os-x-10-9](http://stackoverflow.com/questions/19548011/cannot-install-lxml-on-mac-os-x-10-9)*
 
 ## Issues and PR
