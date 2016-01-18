@@ -13,9 +13,13 @@ Requirements:
 * Python >= 2.7.*
 * ADT >= 16
 
-To install run:
+### Install with pip
 
     pip install android-resource-remover
+	
+### Install from sources
+
+   setup.py install
 
 ## Usage - general
 Open the directory where your app is located and run
