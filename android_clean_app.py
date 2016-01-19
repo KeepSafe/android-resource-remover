@@ -58,7 +58,7 @@ def parse_args():
                              'app directory',
                         default='.')
     parser.add_argument('--xml',
-                        help='Path to the list result. If not specifies linting will be done by the script',
+                        help='Path to the lint result. If not specifies linting will be done by the script',
                         default=None)
     parser.add_argument('--ignore-layouts',
                         help='Should ignore layouts',
@@ -78,6 +78,10 @@ def run_lint_command():
         if call_result > 0:
             print('Running the command failed with result {}. Try running it from the console. Arguments for subprocess.call: {}'.format(
                 call_result, [lint, app_dir, '--xml', lint_result]))
+    else:
+        if not os.path.isabs(lint_result):
+            lint_result = os.path.join(app_dir, lint_result)
+    lint_result = os.path.abspath(lint_result)
     return lint_result, app_dir, ignore_layouts
 
 
@@ -139,8 +143,11 @@ def remove_unused_resources(issues, app_dir, ignore_layouts):
 
 def main():
     lint_result_path, app_dir, ignore_layouts = run_lint_command()
-    issues = parse_lint_result(lint_result_path)
-    remove_unused_resources(issues, app_dir, ignore_layouts)
+    if os.path.exists(lint_result_path):
+        issues = parse_lint_result(lint_result_path)
+        remove_unused_resources(issues, app_dir, ignore_layouts)
+    else:
+        print('the file with lint results could not be found: %s' % lint_result_path)
 
 
 if __name__ == '__main__':
