@@ -13,6 +13,7 @@ import argparse
 import os
 import re
 import subprocess
+import distutils.spawn
 from lxml import etree
 
 
@@ -73,6 +74,8 @@ def run_lint_command():
     """
     lint, app_dir, lint_result, ignore_layouts = parse_args()
     if not lint_result:
+        if not distutils.spawn.find_executable(lint):
+            raise Exception('`%s` executable could not be found and path to lint result not specified. See --help' % lint)
         lint_result = os.path.join(app_dir, 'lint-result.xml')
         call_result = subprocess.call([lint, app_dir, '--xml', lint_result])
         if call_result > 0:
