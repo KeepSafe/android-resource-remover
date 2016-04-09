@@ -43,8 +43,9 @@ class Issue:
             bits = res.split('.')[-2:]
             self.elements.append((bits[0], bits[1]))
         else:
-            print("The pattern '%s' seems to find nothing in the error message '%s'. We can't find the resource and can't remove it. The pattern might have changed, please check and report this in github issues." % (
-                Issue.pattern, message))
+            print("The pattern '%s' seems to find nothing in the error message '%s'. We can't find the resource and "
+                  "can't remove it. The pattern might have changed, please check and report this in github issues." % (
+                      Issue.pattern, message))
 
 
 def parse_args():
@@ -78,8 +79,8 @@ def run_lint_command():
         lint_result = os.path.join(app_dir, 'lint-result.xml')
         call_result = subprocess.call([lint, app_dir, '--xml', lint_result])
         if call_result > 0:
-            print('Running the command failed with result {}. Try running it from the console. Arguments for subprocess.call: {}'.format(
-                call_result, [lint, app_dir, '--xml', lint_result]))
+            print('Running the command failed with result %s. Try running it from the console.'
+                  ' Arguments for subprocess.call: %s' % (call_result, [lint, app_dir, '--xml', lint_result]))
     else:
         if not os.path.isabs(lint_result):
             lint_result = os.path.join(app_dir, lint_result)
@@ -114,7 +115,8 @@ def parse_lint_result(lint_result_path, manifest_path):
         if not skip:
             for location in issue_xml.findall('location'):
                 filepath = location.get('file')
-                # if the location contains line and/or column attribute not the entire resource is unused. that's a guess ;)
+                # if the location contains line and/or column attribute not the entire resource is unused.
+                # that's a guess ;)
                 # TODO stop guessing
                 remove_entire_file = (location.get('line') or location.get('column')) is None
                 issue = Issue(filepath, remove_entire_file)
