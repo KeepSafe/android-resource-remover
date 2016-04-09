@@ -107,12 +107,8 @@ def parse_lint_result(lint_result_path, manifest_path):
 
     for issue_xml in root.findall('.//issue[@id="UnusedResources"]'):
         unused_string = re.match(unused_string_pattern, issue_xml.get('message'))
-        skip = False
-
-        if unused_string and unused_string.group(1) in mainfest_string_refs:
-            skip = True
-
-        if not skip:
+        has_string_in_manifest = unused_string and unused_string.group(1) in mainfest_string_refs
+        if not has_string_in_manifest:
             for location in issue_xml.findall('location'):
                 filepath = location.get('file')
                 # if the location contains line and/or column attribute not the entire resource is unused.
