@@ -9,21 +9,25 @@ from mock import MagicMock, patch
 class CleanAppTestCase(unittest.TestCase):
 
     def test_reads_all_unused_resource_issues(self):
-        actual = clean_app.parse_lint_result('./test/android_app/lint-result.xml')
+        actual = clean_app.parse_lint_result('./test/android_app/lint-result.xml',
+                                             './test/android_app/AndroidManifest.xml')
         self.assertEqual(15, len(actual))
 
     def test_marks_resource_as_save_to_remove(self):
-        actual = clean_app.parse_lint_result('./test/android_app/lint-result.xml')
+        actual = clean_app.parse_lint_result('./test/android_app/lint-result.xml',
+                                             './test/android_app/AndroidManifest.xml')
         remove_entire_file = list(filter(lambda issue: issue.remove_file, actual))
         self.assertEqual(11, len(remove_entire_file))
 
     def test_marks_resource_as_not_save_to_remove_if_it_has_used_values(self):
-        actual = clean_app.parse_lint_result('./test/android_app/lint-result.xml')
+        actual = clean_app.parse_lint_result('./test/android_app/lint-result.xml',
+                                             './test/android_app/AndroidManifest.xml')
         not_remove_entire_file = list(filter(lambda issue: not issue.remove_file, actual))
         self.assertEqual(4, len(not_remove_entire_file))
 
     def test_extracts_correct_info_from_resource(self):
-        issues = clean_app.parse_lint_result('./test/android_app/lint-result.xml')
+        issues = clean_app.parse_lint_result('./test/android_app/lint-result.xml',
+                                             './test/android_app/AndroidManifest.xml')
         not_remove_entire_file = list(filter(lambda issue: not issue.remove_file, issues))
         actual = list(filter(lambda issue: os.path.normpath(issue.filepath) == os.path.normpath(
             'res/values/strings.xml'), not_remove_entire_file))[0]
@@ -104,6 +108,11 @@ class CleanAppTestCase(unittest.TestCase):
         issue.add_element('The resource `R.drawable.drawable_missing` appears to be unused')
 
         clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), False)
+
+    def test_whitelist_string_refs(self):
+        expected = ['app_name']
+        res = clean_app.get_manifest_string_refs('./test/android_app/AndroidManifest.xml')
+        self.assertEqual(res, expected)
 
 
 if __name__ == '__main__':

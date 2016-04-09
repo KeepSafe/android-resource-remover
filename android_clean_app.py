@@ -16,6 +16,8 @@ import subprocess
 import distutils.spawn
 from lxml import etree
 
+ANDROID_MANIFEST_FILE = 'AndroidManifest.xml'
+
 
 class Issue:
 
@@ -42,8 +44,9 @@ class Issue:
             bits = res.split('.')[-2:]
             self.elements.append((bits[0], bits[1]))
         else:
-            print("The pattern '%s' seems to find nothing in the error message '%s'. We can't find the resource and can't remove it. The pattern might have changed, please check and report this in github issues." % (
-                Issue.pattern, message))
+            print("The pattern '%s' seems to find nothing in the error message '%s'. We can't find the resource and "
+                  "can't remove it. The pattern might have changed, please check and report this in github issues." % (
+                      Issue.pattern, message))
 
 
 def parse_args():
@@ -79,8 +82,8 @@ def run_lint_command():
         lint_result = os.path.join(app_dir, 'lint-result.xml')
         call_result = subprocess.call([lint, app_dir, '--xml', lint_result])
         if call_result > 0:
-            print('Running the command failed with result {}. Try running it from the console. Arguments for subprocess.call: {}'.format(
-                call_result, [lint, app_dir, '--xml', lint_result]))
+            print('Running the command failed with result %s. Try running it from the console.'
+                  ' Arguments for subprocess.call: %s' % (call_result, [lint, app_dir, '--xml', lint_result]))
     else:
         if not os.path.isabs(lint_result):
             lint_result = os.path.join(app_dir, lint_result)
@@ -88,21 +91,36 @@ def run_lint_command():
     return lint_result, app_dir, ignore_layouts
 
 
-def parse_lint_result(lint_result_path):
+def get_manifest_string_refs(manifest_path):
+    pattern = re.compile('="@string/([^"]+)"')
+    with open(manifest_path, 'r') as f:
+        data = f.read()
+        refs = set(re.findall(pattern, data))
+        return [x.replace('/', '.') for x in refs]
+
+
+def parse_lint_result(lint_result_path, manifest_path):
     """
-    Parse lint-result.xml and create Issue for every problem found
+    Parse lint-result.xml and create Issue for every problem found except unused strings referenced in AndroidManifest
     """
+    unused_string_pattern = re.compile('The resource `R\.string\.([^`]+)` appears to be unused')
+    mainfest_string_refs = get_manifest_string_refs(manifest_path)
     root = etree.parse(lint_result_path).getroot()
     issues = []
+
     for issue_xml in root.findall('.//issue[@id="UnusedResources"]'):
-        for location in issue_xml.findall('location'):
-            filepath = location.get('file')
-            # if the location contains line and/or column attribute not the entire resource is unused. that's a guess ;)
-            # TODO stop guessing
-            remove_entire_file = (location.get('line') or location.get('column')) is None
-            issue = Issue(filepath, remove_entire_file)
-            issue.add_element(issue_xml.get('message'))
-            issues.append(issue)
+        unused_string = re.match(unused_string_pattern, issue_xml.get('message'))
+        has_string_in_manifest = unused_string and unused_string.group(1) in mainfest_string_refs
+        if not has_string_in_manifest:
+            for location in issue_xml.findall('location'):
+                filepath = location.get('file')
+                # if the location contains line and/or column attribute not the entire resource is unused.
+                # that's a guess ;)
+                # TODO stop guessing
+                remove_entire_file = (location.get('line') or location.get('column')) is None
+                issue = Issue(filepath, remove_entire_file)
+                issue.add_element(issue_xml.get('message'))
+                issues.append(issue)
     return issues
 
 
@@ -147,7 +165,8 @@ def remove_unused_resources(issues, app_dir, ignore_layouts):
 def main():
     lint_result_path, app_dir, ignore_layouts = run_lint_command()
     if os.path.exists(lint_result_path):
-        issues = parse_lint_result(lint_result_path)
+        manifest_path = os.path.abspath(os.path.join(app_dir, ANDROID_MANIFEST_FILE))
+        issues = parse_lint_result(lint_result_path, manifest_path)
         remove_unused_resources(issues, app_dir, ignore_layouts)
     else:
         print('the file with lint results could not be found: %s' % lint_result_path)

@@ -281,4 +281,20 @@ Low density is not really used much anymore, so this check ignores the ldpi dens
             file="res"/>
     </issue>
 
+    <issue
+        id="UnusedResources"
+        severity="Warning"
+        message="The resource `R.string.app_name` appears to be unused"
+        category="Performance"
+        priority="3"
+        summary="Unused resources"
+        explanation="Unused resources make applications larger and slow down builds."
+        errorLine1="    &lt;string name=&quot;app_name&quot;>android-viewbadger demo&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~">
+        <location
+            file="res/values/strings.xml"
+            line="3"
+            column="13"/>
+    </issue>
+
 </issues>
