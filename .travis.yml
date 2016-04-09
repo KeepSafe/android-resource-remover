@@ -4,6 +4,8 @@ python:
   - "3.2"
   - "3.3"
 # command to install dependencies
-install: "pip install -r requirements.txt"
+install: "pip install -r requirements-dev.txt"
 # command to run tests
-script: nosetests
+script:
+  - flake8 android_clean_app.py test
+  - nosetests
