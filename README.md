@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/KeepSafe/android-resource-remover.svg?branch=master)](https://travis-ci.org/KeepSafe/android-resource-remover)
 
-![resource-remover](https://keepsafe.github.io/i/proj/opensource_resource-remover.png) 
+![resource-remover](https://keepsafe.github.io/i/proj/opensource_resource-remover.png)
 android-resource-remover
 ========================
 
@@ -78,6 +78,7 @@ When opening an issue please include as much info as possible. pip.log, python v
 In PR please keep the formatting.
 
 ## Release History
+* 2016-04-09   v0.1.6   Fixes bugs
 * 2015-07-27   v0.1.5   Fixes bugs
 * 2015-05-21   v0.1.4   Fixes bugs
 * 2015-03-31   v0.1.3   Fixes bugs
