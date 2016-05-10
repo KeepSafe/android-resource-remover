@@ -45,6 +45,7 @@ class Issue:
                   "can't remove it. The pattern might have changed, please check and report this in github issues." % (
                       self.pattern, message))
 
+
 class UnusedResourceIssue(Issue):
     pattern = re.compile('The resource `?([^`]+)`? appears to be unused')
 
@@ -109,6 +110,7 @@ def get_manifest_string_refs(manifest_path):
         data = f.read()
         refs = set(re.findall(pattern, data))
         return [x.replace('/', '.') for x in refs]
+
 
 def _get_issues_from_location(issue_class, locations, message):
     issues = []

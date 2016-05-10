@@ -9,9 +9,16 @@ from mock import MagicMock, patch
 class CleanAppTestCase(unittest.TestCase):
 
     def test_reads_all_unused_resource_issues(self):
-        actual = clean_app.parse_lint_result('./test/android_app/lint-result.xml',
+        issues = clean_app.parse_lint_result('./test/android_app/lint-result.xml',
                                              './test/android_app/AndroidManifest.xml')
+        actual = list(filter(lambda i: isinstance(i, clean_app.UnusedResourceIssue), issues))
         self.assertEqual(15, len(actual))
+
+    def test_reads_untranslatable_extra_translation_issues(self):
+        issues = clean_app.parse_lint_result('./test/android_app/lint-result.xml',
+                                             './test/android_app/AndroidManifest.xml')
+        actual = list(filter(lambda i: isinstance(i, clean_app.ExtraTranslationIssue), issues))
+        self.assertEqual(1, len(actual))
 
     def test_marks_resource_as_save_to_remove(self):
         actual = clean_app.parse_lint_result('./test/android_app/lint-result.xml',
@@ -23,9 +30,9 @@ class CleanAppTestCase(unittest.TestCase):
         actual = clean_app.parse_lint_result('./test/android_app/lint-result.xml',
                                              './test/android_app/AndroidManifest.xml')
         not_remove_entire_file = list(filter(lambda issue: not issue.remove_file, actual))
-        self.assertEqual(4, len(not_remove_entire_file))
+        self.assertEqual(5, len(not_remove_entire_file))
 
-    def test_extracts_correct_info_from_resource(self):
+    def test_extracts_correct_info_about_unused_resources(self):
         issues = clean_app.parse_lint_result('./test/android_app/lint-result.xml',
                                              './test/android_app/AndroidManifest.xml')
         not_remove_entire_file = list(filter(lambda issue: not issue.remove_file, issues))
@@ -34,11 +41,20 @@ class CleanAppTestCase(unittest.TestCase):
         self.assertGreater(len(actual.elements), 0)
         self.assertEqual(('string', 'missing'), actual.elements[0])
 
+    def test_extracts_correct_info_about_extra_translations(self):
+        issues = clean_app.parse_lint_result('./test/android_app/lint-result.xml',
+                                             './test/android_app/AndroidManifest.xml')
+        not_remove_entire_file = list(filter(lambda issue: not issue.remove_file, issues))
+        issues = list(filter(lambda issue: os.path.normpath(issue.filepath) == os.path.normpath(
+            'res/values-fr/strings.xml'), not_remove_entire_file))
+        actual = map(lambda i: i.elements[0], issues)
+        self.assertIn(('string', 'untranslatable'), actual)
+
     def test_removes_given_resources_if_safe(self):
         temp, temp_path = tempfile.mkstemp()
         os.close(temp)
 
-        issue = clean_app.Issue(temp_path, True)
+        issue = clean_app.UnusedResourceIssue(temp_path, True)
 
         clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), False)
         with self.assertRaises(IOError):
@@ -55,7 +71,7 @@ class CleanAppTestCase(unittest.TestCase):
         """.encode('utf-8'))
         os.close(temp)
 
-        issue = clean_app.Issue(temp_path, False)
+        issue = clean_app.UnusedResourceIssue(temp_path, False)
         issue.add_element(message)
         clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), True)
 
@@ -85,7 +101,7 @@ class CleanAppTestCase(unittest.TestCase):
         """.encode('UTF-8'))
         os.close(temp)
 
-        issue = clean_app.Issue(temp_path, False)
+        issue = clean_app.UnusedResourceIssue(temp_path, False)
         issue.add_element('The resource R.string.missing appears to be unused')
         clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), False)
 
@@ -104,16 +120,32 @@ class CleanAppTestCase(unittest.TestCase):
         os.close(temp)
         os.remove(temp_path)
 
-        issue = clean_app.Issue(temp_path, False)
+        issue = clean_app.UnusedResourceIssue(temp_path, False)
         issue.add_element('The resource `R.drawable.drawable_missing` appears to be unused')
 
         clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), False)
 
     def test_whitelist_string_refs(self):
-        expected = ['app_name']
+        expected = ['untranslatable', 'app_name']
         res = clean_app.get_manifest_string_refs('./test/android_app/AndroidManifest.xml')
         self.assertEqual(res, expected)
 
+    def test_removes_an_extra_translation_value_from_a_file(self, ):
+        temp, temp_path = tempfile.mkstemp()
+        os.write(temp, """
+            <resources>
+                <string name="app_name">android_app</string>
+                <string name="extra">extra translation</string>
+            </resources>
+        """.encode('utf-8'))
+        os.close(temp)
+
+        issue = clean_app.ExtraTranslationIssue(temp_path, False)
+        issue.add_element('The resource string "`extra`" has been marked as `translatable="false"`')
+        clean_app.remove_unused_resources([issue], os.path.dirname(temp_path), True)
+
+        root = ET.parse(temp_path).getroot()
+        self.assertEqual(1, len(root.findall('string')))
 
 if __name__ == '__main__':
     unittest.main()

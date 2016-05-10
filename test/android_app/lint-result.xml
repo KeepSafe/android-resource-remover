@@ -297,4 +297,22 @@ Low density is not really used much anymore, so this check ignores the ldpi dens
             column="13"/>
     </issue>
 
+    <issue
+        id="ExtraTranslation"
+        severity="Fatal"
+        message="The resource string &quot;`untranslatable`&quot; has been marked as `translatable=&quot;false&quot;`"
+        category="Correctness:Messages"
+        priority="6"
+        summary="Extra translation"
+        explanation="If a string appears in a specific language translation file, but there is no corresponding string in the default locale, then this string is probably unused. (It&apos;s technically possible that your application is only intended to run in a specific locale, but it&apos;s still a good idea to provide a fallback.).
+
+Note that these strings can lead to crashes if the string is looked up on any locale not providing a translation, so it&apos;s important to clean them up."
+        errorLine1="    &lt;string name=&quot;untranslatable&quot;>untraslateable caption&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="res/values-fr/strings.xml"
+            line="5"
+            column="13"/>
+    </issue>
+
 </issues>
