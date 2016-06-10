@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">android_app</string>
+    <string name="untranslatable" translatable="false">untraslatable caption</string>
     <string name="missing">missing</string>
 </resources>

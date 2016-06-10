@@ -24,7 +24,6 @@ class Issue:
     """
     Stores a single issue reported by Android Lint
     """
-    pattern = re.compile('The resource `?([^`]+)`? appears to be unused')
 
     def __init__(self, filepath, remove_file):
         self.filepath = filepath
@@ -38,15 +37,28 @@ class Issue:
         return '{0} {1}'.format(self.filepath, self.elements)
 
     def add_element(self, message):
-        res_all = re.findall(Issue.pattern, message)
+        res_all = re.findall(self.pattern, message)
         if res_all:
-            res = res_all[0]
-            bits = res.split('.')[-2:]
-            self.elements.append((bits[0], bits[1]))
+            self._process_match(res_all)
         else:
             print("The pattern '%s' seems to find nothing in the error message '%s'. We can't find the resource and "
                   "can't remove it. The pattern might have changed, please check and report this in github issues." % (
-                      Issue.pattern, message))
+                      self.pattern, message))
+
+
+class UnusedResourceIssue(Issue):
+    pattern = re.compile('The resource `?([^`]+)`? appears to be unused')
+
+    def _process_match(self, match_result):
+        bits = match_result[0].split('.')[-2:]
+        self.elements.append((bits[0], bits[1]))
+
+
+class ExtraTranslationIssue(Issue):
+    pattern = re.compile('The resource string \"`([^`]+)`\" has been marked as `translatable=\"false')
+
+    def _process_match(self, match_result):
+        self.elements.append(('string', match_result[0]))
 
 
 def parse_args():
@@ -100,6 +112,20 @@ def get_manifest_string_refs(manifest_path):
         return [x.replace('/', '.') for x in refs]
 
 
+def _get_issues_from_location(issue_class, locations, message):
+    issues = []
+    for location in locations:
+        filepath = location.get('file')
+        # if the location contains line and/or column attribute not the entire resource is unused.
+        # that's a guess ;)
+        # TODO stop guessing
+        remove_entire_file = (location.get('line') or location.get('column')) is None
+        issue = issue_class(filepath, remove_entire_file)
+        issue.add_element(message)
+        issues.append(issue)
+    return issues
+
+
 def parse_lint_result(lint_result_path, manifest_path):
     """
     Parse lint-result.xml and create Issue for every problem found except unused strings referenced in AndroidManifest
@@ -110,18 +136,21 @@ def parse_lint_result(lint_result_path, manifest_path):
     issues = []
 
     for issue_xml in root.findall('.//issue[@id="UnusedResources"]'):
+        message = issue_xml.get('message')
         unused_string = re.match(unused_string_pattern, issue_xml.get('message'))
         has_string_in_manifest = unused_string and unused_string.group(1) in mainfest_string_refs
         if not has_string_in_manifest:
-            for location in issue_xml.findall('location'):
-                filepath = location.get('file')
-                # if the location contains line and/or column attribute not the entire resource is unused.
-                # that's a guess ;)
-                # TODO stop guessing
-                remove_entire_file = (location.get('line') or location.get('column')) is None
-                issue = Issue(filepath, remove_entire_file)
-                issue.add_element(issue_xml.get('message'))
-                issues.append(issue)
+            issues.extend(_get_issues_from_location(UnusedResourceIssue,
+                                                    issue_xml.findall('location'),
+                                                    message))
+
+    for issue_xml in root.findall('.//issue[@id="ExtraTranslation"]'):
+        message = issue_xml.get('message')
+        if re.findall(ExtraTranslationIssue.pattern, message):
+            issues.extend(_get_issues_from_location(ExtraTranslationIssue,
+                                                    issue_xml.findall('location'),
+                                                    message))
+
     return issues
 
 
