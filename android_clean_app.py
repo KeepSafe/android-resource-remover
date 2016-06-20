@@ -43,7 +43,7 @@ class Issue:
         else:
             print("The pattern '%s' seems to find nothing in the error message '%s'. We can't find the resource and "
                   "can't remove it. The pattern might have changed, please check and report this in github issues." % (
-                      self.pattern, message))
+                      self.pattern.pattern, message))
 
 
 class UnusedResourceIssue(Issue):
