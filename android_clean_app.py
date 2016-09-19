@@ -16,7 +16,8 @@ import subprocess
 import distutils.spawn
 from lxml import etree
 
-ANDROID_MANIFEST_FILE = 'AndroidManifest.xml'
+ANDROID_MANIFEST_PATH = 'src/main/AndroidManifest.xml'
+ANDROID_MANIFEST_OLD_PATH = 'AndroidManifest.xml'
 
 
 class Issue:
@@ -102,6 +103,14 @@ def run_lint_command():
             lint_result = os.path.join(app_dir, lint_result)
     lint_result = os.path.abspath(lint_result)
     return lint_result, app_dir, ignore_layouts
+
+
+def get_manifest_path(app_dir):
+    manifest_path = os.path.abspath(os.path.join(app_dir, ANDROID_MANIFEST_PATH))
+    if os.path.isfile(manifest_path):
+        return manifest_path
+    else:
+        return os.path.abspath(os.path.join(app_dir, ANDROID_MANIFEST_OLD_PATH))
 
 
 def get_manifest_string_refs(manifest_path):
@@ -195,7 +204,7 @@ def remove_unused_resources(issues, app_dir, ignore_layouts):
 def main():
     lint_result_path, app_dir, ignore_layouts = run_lint_command()
     if os.path.exists(lint_result_path):
-        manifest_path = os.path.abspath(os.path.join(app_dir, ANDROID_MANIFEST_FILE))
+        manifest_path = get_manifest_path(app_dir)
         issues = parse_lint_result(lint_result_path, manifest_path)
         remove_unused_resources(issues, app_dir, ignore_layouts)
     else:
