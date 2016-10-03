@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
     clean_app
     ~~~~~~~~~~
