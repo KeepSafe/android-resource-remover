@@ -8,6 +8,18 @@ from mock import MagicMock, patch
 
 class CleanAppTestCase(unittest.TestCase):
 
+    def test_lookup_manifest_path(self):
+        res = clean_app.get_manifest_path('./test/android_app_2')
+        expected = os.path.abspath('./test/android_app_2/src/main/AndroidManifest.xml')
+
+        self.assertEqual(expected, res)
+
+    def test_lookup_manifest_old_path(self):
+        res = clean_app.get_manifest_path('./test/android_app')
+        expected = os.path.abspath('./test/android_app/AndroidManifest.xml')
+
+        self.assertEqual(expected, res)
+
     def test_reads_all_unused_resource_issues(self):
         issues = clean_app.parse_lint_result('./test/android_app/lint-result.xml',
                                              './test/android_app/AndroidManifest.xml')
